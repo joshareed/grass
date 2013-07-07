@@ -38,8 +38,32 @@ pages = loadPages()
 renderPages()
 
 // render the index
+renderIndex()
 
 /* helper methods */
+def renderIndex() {
+	def index = new Page(content: '', template: 'index', name: config?.site?.name ?: 'Index', title: config?.site?.title, date: new Date(), out: new File(config.destination, 'index.html'))
+	def engine = new SimpleTemplateEngine()
+
+	// preprocess index
+	trigger('beforeIndex', [config, index, pages])
+
+	def binding = newBinding(index)
+	binding.pages = pages
+
+	// evaluate index as groovy template
+	index.content = engine.createTemplate(index.content).make(binding.variables)
+
+	// render index
+	trigger('renderIndex', [config, index])
+
+	// post process index
+	trigger('afterIndex', [config, index])
+
+	// apply index template and write out
+	applyTemplate(binding)
+}
+
 def renderPages() {
 	def engine = new SimpleTemplateEngine()
 
