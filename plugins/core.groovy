@@ -2,7 +2,7 @@ import java.text.SimpleDateFormat
 import groovy.text.SimpleTemplateEngine
 
 class CorePlugin {
-	def DATE = new SimpleDateFormat('yyyy-MM-dd hh:mm')
+	def DATE = new SimpleDateFormat('yyyy-MM-dd')
 
 	def setupBinding(config, binding) {
 		// add bindings to change metadata
@@ -11,11 +11,12 @@ class CorePlugin {
 		binding.title = bind(binding, pageProperty.curry('title'))
 		binding.summary = bind(binding, pageProperty.curry('summary'))
 		binding.out = bind(binding, pageProperty.curry('out'))
-		binding.date = bind(binding, { String date ->
-			page.date = DATE.parse(date)
-		})
-		binding.date = bind(binding, { Date date ->
-			page.date = date
+		binding.date = bind(binding, { date ->
+			if (date instanceof Date) {
+				page.date = date
+			} else {
+				page.date = DATE.parse(date)
+			}
 		})
 		binding.include = bind(binding, { path ->
 			def relative = page.path.parentFile
