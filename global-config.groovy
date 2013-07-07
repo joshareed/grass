@@ -7,5 +7,6 @@ paths {
 }
 
 plugins {
-	disabled = []
+	enabled = [] // add plugin names to whitelist, if empty all plugins loaded
+	disabled = [] // add plugin names to blacklist specific plugins
 }

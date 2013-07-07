@@ -130,6 +130,7 @@ def loadConfig() {
 
 def loadPlugins() {
 	def plugins = []
+	def enabled = config?.plugins?.enabled ?: []
 	def disabled = config?.plugins?.disabled ?: []
 
 	// load the plugin classes
@@ -137,7 +138,7 @@ def loadPlugins() {
 	expandPaths(config?.paths?.plugins ?: []).each { dir ->
 		dir.eachFileMatch(~/.*\.groovy/) { file ->
 			def clazz = classloader.parseClass(file)
-			if (!disabled.contains(clazz.simpleName)) {
+			if ((!enabled || enabled.contains(clazz.simpleName)) && !disabled.contains(clazz.simpleName)) {
 				plugins << clazz.newInstance()
 			}
 		}
