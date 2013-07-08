@@ -3,8 +3,9 @@ import groovy.text.SimpleTemplateEngine
 
 class CorePlugin {
 	def DATE = new SimpleDateFormat('yyyy-MM-dd')
+	def config
 
-	def setupBinding(config, binding) {
+	def setupBinding(binding) {
 		// add bindings to change metadata
 		binding.template = bind(binding, pageProperty.curry('template'))
 		binding.title = bind(binding, pageProperty.curry('name'))

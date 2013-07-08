@@ -1,6 +1,7 @@
 class AssetsPlugin {
+	def config
 
-	def afterIndex(config, index) {
+	def afterIndex(index) {
 		def ant = new AntBuilder()
 
 		// walk through our paths and copy over assets

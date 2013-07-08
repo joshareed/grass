@@ -29,7 +29,7 @@ config.destination.mkdirs()
 
 // load the plugins
 plugins = loadPlugins()
-trigger('init', config)
+trigger('init')
 
 // find all pages
 pages = loadPages()
@@ -46,7 +46,7 @@ def renderIndex() {
 	def engine = new SimpleTemplateEngine()
 
 	// preprocess index
-	trigger('beforeIndex', [config, index, pages])
+	trigger('beforeIndex', [index, pages])
 
 	def binding = newBinding(index)
 	binding.pages = pages
@@ -55,10 +55,10 @@ def renderIndex() {
 	index.content = engine.createTemplate(index.content).make(binding.variables)
 
 	// render index
-	trigger('renderIndex', [config, index])
+	trigger('renderIndex', [index])
 
 	// post process index
-	trigger('afterIndex', [config, index])
+	trigger('afterIndex', [index])
 
 	// apply index template and write out
 	applyTemplate(binding)
@@ -69,7 +69,7 @@ def renderPages() {
 
 	pages.each { page ->
 		// preprocess page
-		trigger('beforePage', [config, page])
+		trigger('beforePage', [page])
 
 		def binding = newBinding(page)
 
@@ -77,10 +77,10 @@ def renderPages() {
 		page.content = engine.createTemplate(page.content).make(binding.variables)
 
 		// render page
-		trigger('renderPage', [config, page])
+		trigger('renderPage', [page])
 
 		// post process page
-		trigger('afterPage', [config, page])
+		trigger('afterPage', [page])
 
 		// apply page template and write out
 		applyTemplate(binding)
@@ -111,7 +111,7 @@ def applyTemplate(binding) {
 
 def newBinding(page) {
 	def binding = new Binding(config: config, page: page)
-	trigger('setupBinding', [config, binding])
+	trigger('setupBinding', [binding])
 	binding
 }
 
@@ -139,7 +139,11 @@ def loadPlugins() {
 		dir.eachFileMatch(~/.*\.groovy/) { file ->
 			def clazz = classloader.parseClass(file)
 			if ((!enabled || enabled.contains(clazz.simpleName)) && !disabled.contains(clazz.simpleName)) {
-				plugins << clazz.newInstance()
+				def instance = clazz.newInstance()
+				if (instance.hasProperty('config')) {
+					instance.config = config
+				}
+				plugins << instance
 			}
 		}
 	}
@@ -167,10 +171,12 @@ def loadPages() {
 	pages
 }
 
-def trigger(event, args) {
+def trigger(event, args = null) {
 	plugins.each { plugin ->
 		if (plugin.respondsTo(event)) {
-			if (args instanceof List) {
+			if (!args) {
+				plugin."$event"()
+			} else if (args instanceof List) {
 				plugin."$event"(*args)
 			} else {
 				plugin."$event"(args)
