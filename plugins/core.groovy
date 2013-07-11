@@ -3,6 +3,8 @@ import groovy.text.SimpleTemplateEngine
 
 class CorePlugin {
 	def DATE = new SimpleDateFormat('yyyy-MM-dd')
+	def DATETIME = new SimpleDateFormat('yyyy-MM-dd hh:mm')
+
 	def config
 
 	def setupBinding(binding) {
@@ -16,7 +18,16 @@ class CorePlugin {
 			if (date instanceof Date) {
 				page.date = date
 			} else {
-				page.date = DATE.parse(date)
+				def str = date.toString()
+				try {
+					page.date = DATETIME.parse(str)
+				} catch (e) {
+					try {
+						page.date = DATE.parse(str)
+					} catch (e2) {
+						// not valid format
+					}
+				}
 			}
 		})
 		binding.include = bind(binding, { path ->
