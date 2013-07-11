@@ -40,13 +40,17 @@ renderPages()
 // render the index
 renderIndex()
 
+// write pages
+writePages()
+
 /* helper methods */
 def renderIndex() {
 	def index = new Page(content: '', template: 'index', name: config?.site?.name ?: 'Index', title: config?.site?.title, date: new Date(), out: new File(config.destination, 'index.html'))
 	def engine = new SimpleTemplateEngine()
 
 	// preprocess index
-	trigger('beforeIndex', [index, pages])
+	trigger('beforeIndex', index)
+	trigger('beforePage', index)
 
 	def binding = newBinding(index)
 	binding.pages = pages
@@ -55,13 +59,15 @@ def renderIndex() {
 	index.content = engine.createTemplate(index.content).make(binding.variables)
 
 	// render index
-	trigger('renderIndex', [index])
+	trigger('renderIndex', index)
+	trigger('renderPage', index)
 
 	// post process index
-	trigger('afterIndex', [index])
+	trigger('afterPage', index)
+	trigger('afterIndex', index)
 
 	// apply index template and write out
-	applyTemplate(binding)
+	applyTemplate(index, binding)
 }
 
 def renderPages() {
@@ -69,7 +75,7 @@ def renderPages() {
 
 	pages.each { page ->
 		// preprocess page
-		trigger('beforePage', [page])
+		trigger('beforePage', page)
 
 		def binding = newBinding(page)
 
@@ -77,36 +83,40 @@ def renderPages() {
 		page.content = engine.createTemplate(page.content).make(binding.variables)
 
 		// render page
-		trigger('renderPage', [page])
+		trigger('renderPage', page)
 
 		// post process page
-		trigger('afterPage', [page])
+		trigger('afterPage', page)
 
 		// apply page template and write out
-		applyTemplate(binding)
+		applyTemplate(page, binding)
 	}
 }
 
-def applyTemplate(binding) {
-	def page = binding.getVariable('page')
-	if (!page.out) { return }
-	if (page.template) {
-		// find the first template that exists
-		def template = expandPaths(config?.paths?.templates ?: []).inject([]) { list, dir ->
-			list << new File(dir, page.template)
-			list << new File(dir, "${page.template}.html")
-			list
-		}.find { it.exists() }
-
-		if (template) {
-			// apply the template
-			page.content = new SimpleTemplateEngine().createTemplate(page.content).make(binding.variables)
-		}
-	}
-
-	if (page.content) {
+def writePages() {
+	pages.each { page ->
 		writeFile(page.out, page.content)
 	}
+}
+
+def applyTemplate(id, content, binding) {
+	def template = expandPaths(config?.paths?.templates ?: []).inject([]) { list, dir ->
+		list << new File(dir, id)
+		list << new File(dir, "${id}.html")
+		list
+	}.find { it.exists() }
+
+	if (template) {
+		// apply the template
+		new SimpleTemplateEngine().createTemplate(template.text).make(binding.variables)
+	} else {
+		content
+	}
+}
+
+def applyTemplate(page, binding) {
+	if (!page.out || !page.template) { return }
+	page.content = applyTemplate(page.template, page.content, binding)
 }
 
 def newBinding(page) {
