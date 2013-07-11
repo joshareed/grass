@@ -37,6 +37,12 @@ class CorePlugin {
 				new SimpleTemplateEngine().createTemplate(file.text).make(binding.variables)
 			}
 		})
+		binding.when = bind(binding, { test, out ->
+			test ? out : ''
+		})
+		binding.unless = bind(binding, { test, out ->
+			test ? '' : out
+		})
 	}
 
 	private Closure pageProperty = { p, v ->
