@@ -112,6 +112,7 @@ def applyTemplate(id, content, binding) {
 	}.find { it.exists() }
 
 	if (template) {
+		binding['.'] = template
 		// apply the template
 		new SimpleTemplateEngine().createTemplate(template.text).make(binding.variables)
 	} else {

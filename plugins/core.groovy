@@ -31,7 +31,10 @@ class CorePlugin {
 			}
 		})
 		binding.include = bind(binding, { path ->
-			def relative = page.path.parentFile
+			def relative = binding.variables['.'] ?: page?.path
+			if (relative?.isFile()) {
+				relative = relative.parentFile
+			}
 			def file = new File(relative, path)
 			if (file.exists()) {
 				new SimpleTemplateEngine().createTemplate(file.text).make(binding.variables)
