@@ -2,19 +2,21 @@ import java.text.SimpleDateFormat
 
 class BlogPlugin {
 	def DATE = new SimpleDateFormat('yyyy-MM-dd')
-	def posts
+	def paths
 	def config
 
 	def init() {
-		// add 'posts' to the page search path
-		posts = config?.paths?.posts ?: []
-		if (posts && config?.paths?.pages) {
-			config.paths.pages.addAll(posts)
+		// add 'paths' to the page search path
+		paths = config?.paths?.posts ?: []
+		if (paths && config?.paths?.pages) {
+			config.paths.pages.addAll(paths)
 		}
 	}
 
 	def beforePage(page) {
-		if (isPost(page)) {
+		decoratePage(page)
+
+		if (page.post) {
 			// set the template to post
 			page.template = 'post'
 
@@ -28,13 +30,26 @@ class BlogPlugin {
 	}
 
 	def afterPage(page) {
-		if (isPost(page)) {
+		if (page.post) {
 			// rewrite output filename using date
 			page.out = "${page.date.format('/yyyy/MM/dd')}/${page.name}.html"
 		}
 	}
 
-	private boolean isPost(page) {
-		posts.find { page.out.startsWith("/${it}") } != null
+	def afterIndex(index, pages) {
+		def posts = pages.findAll { it.post }.sort { it.date }
+		if (posts) {
+			println posts
+		}
+	}
+
+	private decoratePage(page) {
+		// HACK: removes the need for other blog-ish plugins to implement isPost(page) themselves
+		def isPost = paths.find { page.out.startsWith("/${it}") } != null
+		if (isPost) {
+			page.metaClass.isPost = { -> true }
+		} else {
+			page.metaClass.isPost = { -> false }
+		}
 	}
 }
