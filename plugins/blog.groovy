@@ -2,6 +2,9 @@ import java.text.SimpleDateFormat
 
 class BlogPlugin {
 	def DATE = new SimpleDateFormat('yyyy-MM-dd')
+	def LIST_TAG = /<blog:preview\/>/
+	def RECENT_TAG = /<blog:recent\/>/
+
 	def paths
 	def config
 
@@ -36,11 +39,37 @@ class BlogPlugin {
 		}
 	}
 
+	def beforeIndex(index, pages) {
+		// if the index has no content, insert the blog summary tag
+		if (!index.content) {
+			index.content = LIST_TAG
+		}
+	}
+
 	def afterIndex(index, pages) {
 		def posts = pages.findAll { it.post }.sort { it.date }
-		if (posts) {
-			println posts
+		if (index.content.contains(LIST_TAG)) {
+			populatePostList(index, posts)
 		}
+		if (index.content.contains(RECENT_TAG)) {
+			populateRecentList(index, posts)
+		}
+	}
+
+	private populatePostList(index, posts) {
+		def buffer = new StringBuilder()
+		posts.each { post ->
+			buffer.append(applyTemplate('blog/summary', '', new Binding(config: config, post: post)))
+		}
+		index.content = index.content.replace(LIST_TAG, buffer.toString())
+	}
+
+	private populateRecentList(index, posts) {
+		def buffer = new StringBuilder()
+		posts.each { post ->
+			buffer.append(applyTemplate('blog/recent', '', new Binding(config: config, post: post)))
+		}
+		index.content = index.content.replace(RECENT_TAG, buffer.toString())
 	}
 
 	private decoratePage(page) {
