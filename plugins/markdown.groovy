@@ -4,7 +4,7 @@ import com.petebevin.markdown.MarkdownProcessor
 class MarkdownPlugin {
 
 	def renderPage(page) {
-		if (page.path.name.endsWith('.md') || page.path.name.endsWith('.markdown')) {
+		if (page?.path?.name?.endsWith('.md') || page?.path?.name?.endsWith('.markdown')) {
 			def processor = new MarkdownProcessor()
 			page.content = processor.markdown(page.content)
 		}
