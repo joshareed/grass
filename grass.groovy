@@ -21,11 +21,17 @@ cli.d(longOpt: 'destination', args: 1, required: true, 'destination')
 opt = cli.parse(args)
 if (!opt) { return }
 
+// add our plugin methods
+this.metaClass.mixin GrassMixin
+
 // load our config
 config = loadConfig()
 config.source = new File("${opt.s}")
 config.destination = new File("${opt.d}")
 config.destination.mkdirs()
+
+// needed for the Mixin to access the config
+def getConfig() { config }
 
 // load the plugins
 plugins = loadPlugins()
@@ -61,7 +67,7 @@ def renderIndex() {
 	binding.pages = pages
 
 	// evaluate index as groovy template
-	index.content = engine.createTemplate(index.content).make(binding.variables)
+	index.content = evaluate(index.content, binding)
 
 	// render index
 	trigger('renderIndex', [index, pages])
@@ -85,7 +91,7 @@ def renderPages() {
 		def binding = newBinding(page)
 
 		// evaluate page as groovy template
-		page.content = engine.createTemplate(page.content).make(binding.variables)
+		page.content = evaluate(page.content, binding)
 
 		// render page
 		trigger('renderPage', page)
@@ -101,22 +107,6 @@ def renderPages() {
 def writePages() {
 	pages.each { page ->
 		writeFile(page.out, page.content)
-	}
-}
-
-def applyTemplate(id, content, binding) {
-	def template = expandPaths(config?.paths?.templates ?: []).inject([]) { list, dir ->
-		list << new File(dir, id)
-		list << new File(dir, "${id}.html")
-		list
-	}.find { it.exists() }
-
-	if (template) {
-		binding['.'] = template
-		// apply the template
-		new SimpleTemplateEngine().createTemplate(template.text).make(binding.variables)
-	} else {
-		content
 	}
 }
 
@@ -159,6 +149,7 @@ def loadPlugins() {
 				if (instance.hasProperty('config')) {
 					instance.config = config
 				}
+				instance.metaClass.mixin GrassMixin
 				plugins << instance
 			}
 		}
@@ -201,18 +192,43 @@ def trigger(event, args = null) {
 	}
 }
 
-def expandPaths(paths) {
-	[paths].flatten().inject([]) { list, path ->
-		list << new File(path)
-		list << new File(config.source, path)
-		list
-	}.findAll { it.exists() }
-}
+// added to this script as well as all plugins
+class GrassMixin {
 
-def writeFile(path, content) {
-	if (path && content) {
-		def out = new File(config.destination, path)
-		out.parentFile.mkdirs()
-		out.write(content)
+	def evaluate(template, binding) {
+		new SimpleTemplateEngine().createTemplate(template).make(binding.variables)
+	}
+
+	def applyTemplate(id, content, binding) {
+		def template = expandPaths(config?.paths?.templates ?: []).inject([]) { list, dir ->
+			list << new File(dir, id)
+			list << new File(dir, "${id}.html")
+			list
+		}.find { it.exists() }
+
+		if (template) {
+			binding['.'] = template
+			binding.content = content
+			// apply the template
+			evaluate(template.text, binding)
+		} else {
+			content
+		}
+	}
+
+	def expandPaths(paths) {
+		[paths].flatten().inject([]) { list, path ->
+			list << new File(path)
+			list << new File(config.source, path)
+			list
+		}.findAll { it.exists() }
+	}
+
+	def writeFile(path, content) {
+		if (path && content) {
+			def out = new File(config.destination, path)
+			out.parentFile.mkdirs()
+			out.write(content)
+		}
 	}
 }
