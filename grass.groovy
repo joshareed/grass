@@ -53,9 +53,10 @@ def renderIndex() {
 	def engine = new SimpleTemplateEngine()
 
 	// preprocess index
-	trigger('beforeIndex', index)
+	trigger('beforeIndex', [index, pages])
 	trigger('beforePage', index)
 
+	// add all pages to the binding
 	def binding = newBinding(index)
 	binding.pages = pages
 
@@ -63,15 +64,15 @@ def renderIndex() {
 	index.content = engine.createTemplate(index.content).make(binding.variables)
 
 	// render index
-	trigger('renderIndex', index)
+	trigger('renderIndex', [index, pages])
 	trigger('renderPage', index)
 
-	// post process index
-	trigger('afterPage', index)
-	trigger('afterIndex', index)
-
-	// apply index template and write out
+	// apply index template
 	applyTemplate(index, binding)
+
+	// post process index
+	trigger('afterIndex', [index, pages])
+	trigger('afterPage', index)
 }
 
 def renderPages() {
@@ -89,11 +90,11 @@ def renderPages() {
 		// render page
 		trigger('renderPage', page)
 
+		// apply page template
+		applyTemplate(page, binding)
+
 		// post process page
 		trigger('afterPage', page)
-
-		// apply page template and write out
-		applyTemplate(page, binding)
 	}
 }
 
