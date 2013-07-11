@@ -48,7 +48,8 @@ trigger('cleanup')
 
 /* helper methods */
 def renderIndex() {
-	def index = new Page(content: '', template: 'index', name: config?.site?.name ?: 'Index', title: config?.site?.title, date: new Date(), out: new File(config.destination, 'index.html'))
+	def index = new Page(content: '', template: 'index', name: config?.site?.name ?: 'Index', title: config?.site?.title, date: new Date(), out: 'index.html')
+	pages << index
 	def engine = new SimpleTemplateEngine()
 
 	// preprocess index
