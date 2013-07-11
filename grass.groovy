@@ -43,6 +43,9 @@ renderIndex()
 // write pages
 writePages()
 
+// trigger a cleanup event
+trigger('cleanup')
+
 /* helper methods */
 def renderIndex() {
 	def index = new Page(content: '', template: 'index', name: config?.site?.name ?: 'Index', title: config?.site?.title, date: new Date(), out: new File(config.destination, 'index.html'))
