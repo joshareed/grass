@@ -32,9 +32,10 @@ config.destination.mkdirs()
 
 // needed for the Mixin to access the config
 def getConfig() { config }
+def getPlugins() { config.plugins }
 
 // load the plugins
-plugins = loadPlugins()
+config.plugins = loadPlugins()
 trigger('init')
 
 // find all pages
@@ -63,7 +64,7 @@ def renderIndex() {
 	trigger('beforePage', index)
 
 	// add all pages to the binding
-	def binding = newBinding(index)
+	def binding = newBinding(page: index)
 	binding.pages = pages
 
 	// evaluate index as groovy template
@@ -88,7 +89,7 @@ def renderPages() {
 		// preprocess page
 		trigger('beforePage', page)
 
-		def binding = newBinding(page)
+		def binding = newBinding(page: page)
 
 		// evaluate page as groovy template
 		page.content = evaluate(page.content, binding)
@@ -113,12 +114,6 @@ def writePages() {
 def applyTemplate(page, binding) {
 	if (!page.out || !page.template) { return }
 	page.content = applyTemplate(page.template, page.content, binding)
-}
-
-def newBinding(page) {
-	def binding = new Binding(config: config, page: page)
-	trigger('setupBinding', [binding])
-	binding
 }
 
 def loadConfig() {
@@ -178,25 +173,16 @@ def loadPages() {
 	pages
 }
 
-def trigger(event, args = null) {
-	plugins.each { plugin ->
-		if (plugin.respondsTo(event)) {
-			if (!args) {
-				plugin."$event"()
-			} else if (args instanceof List) {
-				plugin."$event"(*args)
-			} else {
-				plugin."$event"(args)
-			}
-		}
-	}
-}
-
 // added to this script as well as all plugins
 class GrassMixin {
 
 	def evaluate(template, binding) {
-		new SimpleTemplateEngine().createTemplate(template).make(binding.variables)
+		binding.values().each { v ->
+			if (v instanceof Closure) {
+				v.delegate = binding
+			}
+		}
+		new SimpleTemplateEngine().createTemplate(template).make(binding).toString()
 	}
 
 	def applyTemplate(id, content, binding) {
@@ -230,5 +216,30 @@ class GrassMixin {
 			out.parentFile.mkdirs()
 			out.write(content)
 		}
+	}
+
+	def newBinding(Map binding = [:]) {
+		binding.config = config
+		trigger('setupBinding', [binding])
+		binding
+	}
+
+	def trigger(event, args = null) {
+		config.plugins.each { plugin ->
+			if (plugin.respondsTo(event)) {
+				if (!args) {
+					plugin."$event"()
+				} else if (args instanceof List) {
+					plugin."$event"(*args)
+				} else {
+					plugin."$event"(args)
+				}
+			}
+		}
+	}
+
+	def fail(msg) {
+		System.err.println(msg)
+		System.exit(-1)
 	}
 }
