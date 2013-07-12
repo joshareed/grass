@@ -2,7 +2,7 @@ import java.text.SimpleDateFormat
 
 class BlogPlugin {
 	def DATE = new SimpleDateFormat('yyyy-MM-dd')
-	def LIST_TAG = /<blog:preview\/>/
+	def LIST_TAG = /<blog:list\/>/
 	def RECENT_TAG = /<blog:recent\/>/
 
 	def paths
@@ -47,7 +47,7 @@ class BlogPlugin {
 	}
 
 	def afterIndex(index, pages) {
-		def posts = pages.findAll { it.post }.sort { it.date }
+		def posts = pages.findAll { it.post }.sort { a, b -> b.date <=> a.date }
 		if (index.content.contains(LIST_TAG)) {
 			populatePostList(index, posts)
 		}
@@ -57,19 +57,12 @@ class BlogPlugin {
 	}
 
 	private populatePostList(index, posts) {
-		def buffer = new StringBuilder()
-		posts.each { post ->
-			buffer.append(applyTemplate('blog/summary', '', new Binding(config: config, post: post)))
-		}
-		index.content = index.content.replace(LIST_TAG, buffer.toString())
+		index.content = index.content.replace(LIST_TAG, applyTemplate('blog/list', '', newBinding(posts: posts)).toString())
 	}
 
 	private populateRecentList(index, posts) {
-		def buffer = new StringBuilder()
-		posts.each { post ->
-			buffer.append(applyTemplate('blog/recent', '', new Binding(config: config, post: post)))
-		}
-		index.content = index.content.replace(RECENT_TAG, buffer.toString())
+		def recent = posts.take(config?.blog?.recent ?: 5)
+		index.content = index.content.replace(RECENT_TAG, applyTemplate('blog/recent', '', newBinding(posts: recent)).toString())
 	}
 
 	private decoratePage(page) {
