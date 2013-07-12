@@ -9,12 +9,12 @@ class CorePlugin {
 
 	def setupBinding(binding) {
 		// add bindings to change metadata
-		binding.template = bind(binding, pageProperty.curry('template'))
-		binding.title = bind(binding, pageProperty.curry('name'))
-		binding.title = bind(binding, pageProperty.curry('title'))
-		binding.summary = bind(binding, pageProperty.curry('summary'))
-		binding.out = bind(binding, pageProperty.curry('out'))
-		binding.date = bind(binding, { date ->
+		binding.template = pageProperty.curry('template')
+		binding.title = pageProperty.curry('name')
+		binding.title = pageProperty.curry('title')
+		binding.summary = pageProperty.curry('summary')
+		binding.out = pageProperty.curry('out')
+		binding.date = { date ->
 			if (date instanceof Date) {
 				page.date = date
 			} else {
@@ -29,31 +29,51 @@ class CorePlugin {
 					}
 				}
 			}
-		})
-		binding.include = bind(binding, { path ->
-			def relative = binding.variables['.'] ?: page?.path
+		}
+		binding.include = { path ->
+			def relative = binding['.'] ?: page?.path
 			if (relative?.isFile()) {
 				relative = relative.parentFile
 			}
 			def file = new File(relative, path)
 			if (file.exists()) {
-				new SimpleTemplateEngine().createTemplate(file.text).make(binding.variables)
+				evaluate(file.text, binding)
 			}
-		})
-		binding.when = bind(binding, { test, out ->
+		}
+		binding.render = { Map args ->
+			// setup our relative path
+			def relative = binding['.'] ?: page?.path
+			if (relative?.isFile()) {
+				relative = relative.parentFile
+			}
+
+			def pathKey = ['path', 'template', 'using'].find { args.containsKey(it) }
+			if (!pathKey) fail('Template path required')
+			def path = args[pathKey]
+
+			def file = new File(relative, path)
+			if (file.exists()) {
+				def data = [:]
+				data.putAll(binding)
+
+				def varKey = ['var', 'as'].find { args[it] }
+				def var = varKey ? args[varKey] : 'it'
+
+				args.model.collect { m ->
+					data[var] = m
+					new SimpleTemplateEngine().createTemplate(file.text).make(data).toString()
+				}.join('\n')
+			}
+		}
+		binding.when = { test, out ->
 			test ? out : ''
-		})
-		binding.unless = bind(binding, { test, out ->
+		}
+		binding.unless = { test, out ->
 			test ? '' : out
-		})
+		}
 	}
 
 	private Closure pageProperty = { p, v ->
 		page."$p" = v
-	}
-
-	private bind(delegate, closure) {
-		closure.delegate = delegate
-		closure
 	}
 }
