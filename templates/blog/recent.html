@@ -1,5 +1,3 @@
 <ul class="recent">
-	<%=
-		posts.collect { post -> """<li class="post"><a href="${post.out.substring(1)}">${post.title}</a></li>""" }.join('\n')
-	%>
+	${render(model: posts, as: 'post', using: '_brief.html')}
 </ul>
