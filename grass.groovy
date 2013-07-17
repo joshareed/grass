@@ -107,7 +107,9 @@ def renderPages() {
 
 def writePages() {
 	pages.each { page ->
+		trigger('beforeWrite', page)
 		writeFile(page.out, page.content)
+		trigger('afterWrite', page)
 	}
 }
 

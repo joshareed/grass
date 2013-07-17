@@ -15,11 +15,9 @@ class MenuPlugin {
 		}
 	}
 
-	def afterIndex(index, pages) {
-		pages.each { page ->
-			if (page.content.contains(PAGES_TAG)) {
-				page.content = page.content.replace(PAGES_TAG, applyTemplate('menu/pages', '', newBinding(pages: menu)).toString())
-			}
+	def beforeWrite(page) {
+		if (page.content.contains(PAGES_TAG)) {
+			page.content = page.content.replace(PAGES_TAG, applyTemplate('menu/pages', '', newBinding(pages: menu)).toString())
 		}
 	}
 }

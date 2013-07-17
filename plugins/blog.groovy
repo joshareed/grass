@@ -7,6 +7,7 @@ class BlogPlugin {
 
 	def paths
 	def config
+	def posts
 
 	def init() {
 		// add 'paths' to the page search path
@@ -47,14 +48,15 @@ class BlogPlugin {
 	}
 
 	def afterIndex(index, pages) {
-		def posts = pages.findAll { it.post }.sort { a, b -> b.date <=> a.date }
-		pages.each { page ->
-			if (page.content.contains(LIST_TAG)) {
-				populatePostList(page, posts)
-			}
-			if (page.content.contains(RECENT_TAG)) {
-				populateRecentList(page, posts)
-			}
+		posts = pages.findAll { it.post }.sort { a, b -> b.date <=> a.date }
+	}
+
+	def beforeWrite(page) {
+		if (page.content.contains(LIST_TAG)) {
+			populatePostList(page, posts)
+		}
+		if (page.content.contains(RECENT_TAG)) {
+			populateRecentList(page, posts)
 		}
 	}
 
