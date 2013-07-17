@@ -1,0 +1,5 @@
+<ul class="recent">
+	<%=
+		posts.collect { post -> """<li class="post"><a href="${post.out.substring(1)}">${post.title}</a></li>""" }.join('\n')
+	%>
+</ul>

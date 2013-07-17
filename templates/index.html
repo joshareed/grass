@@ -1,0 +1,18 @@
+<html>
+<head>
+	${include('fragments/head.html')}
+</head>
+<body>
+	${include('fragments/header.html')}
+	${include('fragments/nav.html')}
+	<div id="main">
+		<div id="content">
+			<blog:list/>
+		</div>
+		<div id="sidebar">
+			<blog:recent/>
+		</div>
+	</div>
+	${include('fragments/footer.html')}
+</body>
+</html>

@@ -1,0 +1,20 @@
+<html>
+<head>
+	${include('fragments/head.html')}
+</head>
+<body>
+	${include('fragments/header.html')}
+	${include('fragments/nav.html')}
+	<div id="main">
+		<div id="content">
+			<article role="article">
+				<header>
+					<h1>${page.title}</h1>
+				</header>
+				<div>${page.content}</div>
+			</article>
+		</div>
+	</div>
+	${include('fragments/footer.html')}
+</body>
+</html>
