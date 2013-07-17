@@ -48,21 +48,23 @@ class BlogPlugin {
 
 	def afterIndex(index, pages) {
 		def posts = pages.findAll { it.post }.sort { a, b -> b.date <=> a.date }
-		if (index.content.contains(LIST_TAG)) {
-			populatePostList(index, posts)
-		}
-		if (index.content.contains(RECENT_TAG)) {
-			populateRecentList(index, posts)
+		pages.each { page ->
+			if (page.content.contains(LIST_TAG)) {
+				populatePostList(page, posts)
+			}
+			if (page.content.contains(RECENT_TAG)) {
+				populateRecentList(page, posts)
+			}
 		}
 	}
 
-	private populatePostList(index, posts) {
-		index.content = index.content.replace(LIST_TAG, applyTemplate('blog/list', '', newBinding(posts: posts)).toString())
+	private populatePostList(page, posts) {
+		page.content = page.content.replace(LIST_TAG, applyTemplate('blog/list', '', newBinding(posts: posts)).toString())
 	}
 
-	private populateRecentList(index, posts) {
+	private populateRecentList(page, posts) {
 		def recent = posts.take(config?.blog?.recent ?: 5)
-		index.content = index.content.replace(RECENT_TAG, applyTemplate('blog/recent', '', newBinding(posts: recent)).toString())
+		page.content = page.content.replace(RECENT_TAG, applyTemplate('blog/recent', '', newBinding(posts: recent)).toString())
 	}
 
 	private decoratePage(page) {
