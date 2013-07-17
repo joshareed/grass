@@ -8,6 +8,7 @@ class BlogPlugin {
 	def paths
 	def config
 	def posts
+	def recent
 
 	def init() {
 		// add 'paths' to the page search path
@@ -49,24 +50,16 @@ class BlogPlugin {
 
 	def afterIndex(index, pages) {
 		posts = pages.findAll { it.post }.sort { a, b -> b.date <=> a.date }
+		recent = posts.take(config?.blog?.recent ?: 5)
 	}
 
 	def beforeWrite(page) {
 		if (page.content.contains(LIST_TAG)) {
-			populatePostList(page, posts)
+			page.content = page.content.replace(LIST_TAG, applyTemplate('blog/list', '', newBinding(posts: posts)).toString())
 		}
 		if (page.content.contains(RECENT_TAG)) {
-			populateRecentList(page, posts)
+			page.content = page.content.replace(RECENT_TAG, applyTemplate('blog/recent', '', newBinding(posts: recent)).toString())
 		}
-	}
-
-	private populatePostList(page, posts) {
-		page.content = page.content.replace(LIST_TAG, applyTemplate('blog/list', '', newBinding(posts: posts)).toString())
-	}
-
-	private populateRecentList(page, posts) {
-		def recent = posts.take(config?.blog?.recent ?: 5)
-		page.content = page.content.replace(RECENT_TAG, applyTemplate('blog/recent', '', newBinding(posts: recent)).toString())
 	}
 
 	private decoratePage(page) {
