@@ -29,20 +29,20 @@ config = loadConfig()
 config.source = new File("${opt.s}")
 config.destination = new File("${opt.d}")
 config.destination.mkdirs()
+config.pages = []
+config.plugins = []
 
 // needed for the Mixin to access the config
 def getConfig() { config }
 def getPlugins() { config.plugins }
+def getPages() { config.pages }
 
 // load the plugins
-config.plugins = loadPlugins()
+loadPlugins()
 trigger('init')
 
-// find all pages
-pages = loadPages()
-
-// render pages
-renderPages()
+// find all the pages
+loadPages()
 
 // render the index
 renderIndex()
@@ -56,53 +56,11 @@ trigger('cleanup')
 /* helper methods */
 def renderIndex() {
 	def index = new Page(content: '', template: 'index', name: config?.site?.name ?: 'Index', title: config?.site?.title, date: new Date(), out: 'index.html')
-	pages << index
-	def engine = new SimpleTemplateEngine()
 
 	// preprocess index
 	trigger('beforeIndex', [index, pages])
-	trigger('beforePage', index)
-
-	// add all pages to the binding
-	def binding = newBinding(page: index)
-	binding.pages = pages
-
-	// evaluate index as groovy template
-	index.content = evaluate(index.content, binding)
-
-	// render index
-	trigger('renderIndex', [index, pages])
-	trigger('renderPage', index)
-
-	// apply index template
-	applyTemplate(index, binding)
-
-	// post process index
+	addPage(index)
 	trigger('afterIndex', [index, pages])
-	trigger('afterPage', index)
-}
-
-def renderPages() {
-	def engine = new SimpleTemplateEngine()
-
-	pages.each { page ->
-		// preprocess page
-		trigger('beforePage', page)
-
-		def binding = newBinding(page: page)
-
-		// evaluate page as groovy template
-		page.content = evaluate(page.content, binding)
-
-		// render page
-		trigger('renderPage', page)
-
-		// apply page template
-		applyTemplate(page, binding)
-
-		// post process page
-		trigger('afterPage', page)
-	}
 }
 
 def writePages() {
@@ -132,7 +90,6 @@ def loadConfig() {
 }
 
 def loadPlugins() {
-	def plugins = []
 	def enabled = config?.plugins?.enabled ?: []
 	def disabled = config?.plugins?.disabled ?: []
 
@@ -151,13 +108,9 @@ def loadPlugins() {
 			}
 		}
 	}
-
-	plugins
 }
 
 def loadPages() {
-	def pages = []
-
 	expandPaths(config?.paths?.pages ?: []).each { dir ->
 		dir.eachFile { file ->
 			// create our page object
@@ -168,15 +121,40 @@ def loadPages() {
 			def title = name.split('-').collect { it.capitalize() }.join(' ')
 			def out = file.parentFile.absolutePath - config.source.absolutePath + "${File.separator}${name}.html"
 
-			pages << new Page(path: file, content: file.text, template: 'page', name: name, title: title, date: new Date(file.lastModified()), out: out)
+			addPage(path: file, content: file.text, template: 'page', name: name, title: title, date: new Date(file.lastModified()), out: out)
 		}
 	}
-
-	pages
 }
 
 // added to this script as well as all plugins
 class GrassMixin {
+
+	def addPage(Map data) {
+		addPage(new Page(data))
+	}
+
+	def addPage(Page page) {
+		def engine = new SimpleTemplateEngine()
+		// preprocess page
+		trigger('beforePage', page)
+
+		def binding = newBinding(page: page)
+
+		// evaluate page as groovy template
+		page.content = evaluate(page.content, binding)
+
+		// render page
+		trigger('renderPage', page)
+
+		// apply page template
+		applyTemplate(page, binding)
+
+		// post process page
+		trigger('afterPage', page)
+
+		// add the page to the list
+		pages << page
+	}
 
 	def evaluate(template, binding) {
 		binding.values().each { v ->
