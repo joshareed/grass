@@ -71,6 +71,12 @@ class CorePlugin {
 		binding.unless = { test, out ->
 			test ? '' : out
 		}
+		binding.isodate = { date ->
+			date.format("yyyy-MM-dd'T'HH:mm:ssZ")
+		}
+		binding.prettydate = { date ->
+			date.format("MMM dd, yyyy")
+		}
 	}
 
 	private Closure pageProperty = { p, v ->

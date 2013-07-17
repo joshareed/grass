@@ -2,7 +2,7 @@
 	<header>
 		<h1>${post.title}</h1>
 		<p class="meta">
-			<time datetime="${post.date}">${post.date}</time>
+			<time datetime="${isodate(post.date)}">${prettydate(post.date)}</time>
 		</p>
 	</header>
 	${post.summary}
