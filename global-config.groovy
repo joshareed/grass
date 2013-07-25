@@ -1,7 +1,7 @@
 paths {
 	pages = ['pages']
 	posts = ['posts']
-	assets = ['files', 'css', 'js', 'images']
+	assets = ['assets/files', 'assets/css', 'assets/js', 'assets/images']
 	plugins = ['plugins']
 	templates = ['templates']
 }

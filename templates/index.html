@@ -3,16 +3,14 @@
 	${include('_head.html')}
 </head>
 <body>
-	${include('_header.html')}
-	${include('_nav.html')}
-	<div id="main">
-		<div id="content">
-			<blog:list/>
-		</div>
-		<aside id="sidebar">
-			<blog:recent/>
-		</aside>
-	</div>
-	${include('_footer.html')}
+	<section id="content">
+		<blog:list/>
+	</section>
+	<aside id="sidebar">
+		${include('_header.html')}
+		${include('_nav.html')}
+		<blog:recent/>
+		${include('_footer.html')}
+	</aside>
 </body>
 </html>

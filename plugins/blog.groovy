@@ -4,6 +4,8 @@ class BlogPlugin {
 	def DATE = new SimpleDateFormat('yyyy-MM-dd')
 	def LIST_TAG = /<blog:list\/>/
 	def RECENT_TAG = /<blog:recent\/>/
+	def PREVIOUS_TAG = /<blog:previous\/>/
+	def NEXT_TAG = /<blog:next\/>/
 
 	def paths
 	def config
@@ -59,6 +61,22 @@ class BlogPlugin {
 		}
 		if (page.content.contains(RECENT_TAG)) {
 			page.content = page.content.replace(RECENT_TAG, applyTemplate('blog/recent', '', newBinding(posts: recent)).toString())
+		}
+		if (page.content.contains(PREVIOUS_TAG)) {
+			def previous = posts.indexOf(page) - 1
+			if (previous >= 0) {
+				page.content = page.content.replace(PREVIOUS_TAG, applyTemplate('blog/_previous', '', newBinding(post: posts[previous])).toString())
+			} else {
+				page.content = page.content.replace(PREVIOUS_TAG, '')
+			}
+		}
+		if (page.content.contains(NEXT_TAG)) {
+			def next = posts.indexOf(page) + 1
+			if (next < posts.size()) {
+				page.content = page.content.replace(NEXT_TAG, applyTemplate('blog/_next', '', newBinding(post: posts[next])).toString())
+			} else {
+				page.content = page.content.replace(NEXT_TAG, '')
+			}
 		}
 	}
 
