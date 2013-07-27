@@ -7,7 +7,7 @@
 	</header>
 	${post.summary}
 	<footer>
-		<a rel="full-article" href="${post.out.substring(1)}">
+		<a rel="full-article" href="${createLink(post: post)}">
 			${when(post.summarized, 'Read More &rarr;')}
 			${when(!post.summarized, 'Permalink &rarr;')}
 		</a>
