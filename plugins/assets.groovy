@@ -8,7 +8,7 @@ class AssetsPlugin {
 	}
 
 	def setupBinding(binding) {
-		binding.createLinkToAsset = { String name ->
+		binding.createLinkToAsset = { String name, boolean absolute ->
 			// check if the asset exists
 			def asset = config?.paths?.assets?.find { path ->
 				def global = new File(path)
@@ -23,7 +23,7 @@ class AssetsPlugin {
 
 				return null
 			}
-			binding.createLinkToUrl(asset ? "/${asset}/${name}" : "${name}")
+			binding.createLinkToUrl(asset ? "/${asset}/${name}" : "${name}", absolute)
 		}
 	}
 

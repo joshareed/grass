@@ -1,15 +1,23 @@
 class LinksPlugin {
 	def config
 
-	private createLinkToPage(Page target) {
-		createLinkToUrl(target.out)
+	private createLinkToPage(Page target, boolean absolute) {
+		createLinkToUrl(target.out, absolute)
 	}
 
-	private createLinkToUrl(String url) {
+	private createLinkToUrl(String url, boolean absolute) {
 		if (url.toLowerCase().startsWith('http')) {
 			url
 		} else {
-			"${config?.site?.url ?: ''}${!config?.site?.url?.endsWith('/') && !url.startsWith('/') ? '/' : ''}${url}"
+			def buffer = new StringBuilder()
+			if (absolute) {
+				buffer.append(config?.site?.url ?: '')
+			}
+			if (!buffer.toString().endsWith('/') && !url.startsWith('/')) {
+				buffer.append('/')
+			}
+			buffer.append(url)
+			buffer
 		}
 	}
 
@@ -20,14 +28,15 @@ class LinksPlugin {
 		// dynamic dispatch based on the args to createLink()
 		binding.createLink = { target ->
 			if (target instanceof Page) {
-				binding.createLinkToPage(target)
+				binding.createLinkToPage(target, false)
 			} else if (target instanceof Map) {
 				def type = (config?.plugin?.links?.dispatch ?: []).find { target[it] }
+				def absolute = target.containsKey('absolute') ? target.absolute : false
 				if (type) {
-					binding."createLinkTo${type.capitalize()}"(target[type])
+					binding."createLinkTo${type.capitalize()}"(target[type], absolute)
 				}
 			} else {
-				binding.createLinkToUrl(target.toString())
+				binding.createLinkToUrl(target.toString(), false)
 			}
 		}
 	}

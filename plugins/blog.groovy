@@ -25,7 +25,9 @@ class BlogPlugin {
 	}
 
 	def setupBinding(binding) {
-		binding.createLinkToPost = binding.&createLinkToPage
+		binding.createLinkToPost = { Page post, boolean absolute ->
+			binding.createLinkToPage(post, absolute)
+		}
 	}
 
 	def beforePage(page) {
