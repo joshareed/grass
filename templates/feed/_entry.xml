@@ -1,0 +1,11 @@
+<entry>
+	<title>${post.title}</title>
+	<link href="${createLink(post: post, absolute: true)}" />
+	<id>${createLink(post: post, absolute: true)}</id>
+	<updated>${isodate(post.date)}</updated>
+	<summary>${post.summary}</summary>
+	<author>
+		<name>${site.author}</name>
+		<email>${site.email}</email>
+	</author>
+</entry>

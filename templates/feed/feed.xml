@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+	<title>${site.title}</title>
+	<subtitle>${site.subtitle ?: ''}</subtitle>
+	<link href="${createLink(url: '/', absolute: true)}" rel="self" />
+	<link href="${createLink(url: '/', absolute: true)}" />
+	<id>${createLink(url: '/', absolute: true)}</id>
+	<updated>${isodate(new Date())}</updated>
+	${render(model: posts, as: 'post', using: '_entry.xml')}
+</feed>
