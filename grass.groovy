@@ -71,11 +71,6 @@ def writePages() {
 	}
 }
 
-def applyTemplate(page, binding) {
-	if (!page.out || !page.template) { return }
-	page.content = applyTemplate(page.template, page.content, binding)
-}
-
 def loadConfig() {
 	def config = new ConfigObject()
 	def global = new File("global-config.groovy")
@@ -153,7 +148,7 @@ class GrassMixin {
 		trigger('afterPage', page)
 
 		// add the page to the list
-		pages << page
+		config.pages << page
 	}
 
 	def evaluate(template, binding) {
@@ -163,6 +158,11 @@ class GrassMixin {
 			}
 		}
 		new SimpleTemplateEngine().createTemplate(template).make(binding).toString()
+	}
+
+	def applyTemplate(page, binding) {
+		if (!page.out || !page.template) { return }
+		page.content = applyTemplate(page.template, page.content, binding)
 	}
 
 	def applyTemplate(id, content, binding) {
