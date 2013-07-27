@@ -5,8 +5,8 @@ class FeedPlugin {
 
 	def afterIndex(index, pages) {
 		def posts = pages.findAll { it.post }.sort { a, b -> b.date <=> a.date }
-		def content = applyTemplate('feed/feed.xml', '', newBinding(posts: posts, site: config.site))
-		addPage(content: content, name: 'Atom Feed', title: 'Atom Feed', date: new Date(), out: 'feed.xml')
+		def content = applyTemplate('feed/atom.xml', '', newBinding(posts: posts, site: config.site))
+		addPage(content: content, name: 'Atom Feed', title: 'Atom Feed', date: new Date(), out: 'atom.xml')
 	}
 
 	def beforeWrite(page) {
