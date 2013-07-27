@@ -18,6 +18,14 @@ class BlogPlugin {
 		if (paths && config?.paths?.pages) {
 			config.paths.pages.addAll(paths)
 		}
+
+		if (config?.plugin?.links?.dispatch) {
+			config?.plugin?.links?.dispatch << 'post'
+		}
+	}
+
+	def setupBinding(binding) {
+		binding.createLinkToPost = binding.&createLinkToPage
 	}
 
 	def beforePage(page) {
