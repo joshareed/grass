@@ -31,6 +31,7 @@ class LinksPlugin {
 				binding.createLinkToPage(target, false)
 			} else if (target instanceof Map) {
 				def type = (config?.plugin?.links?.dispatch ?: []).find { target[it] }
+				if (!type) { fail("Don't know how to create a link for: ${target}") }
 				def absolute = target.containsKey('absolute') ? target.absolute : false
 				if (type) {
 					binding."createLinkTo${type.capitalize()}"(target[type], absolute)
