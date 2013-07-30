@@ -91,12 +91,7 @@ class BlogPlugin {
 	}
 
 	private decoratePage(page) {
-		// HACK: removes the need for other blog-ish plugins to implement isPost(page) themselves
 		def isPost = paths.find { page.out.startsWith("/${it}") } != null
-		if (isPost) {
-			page.metaClass.isPost = { -> true }
-		} else {
-			page.metaClass.isPost = { -> false }
-		}
+		page.metaClass.post = isPost
 	}
 }
