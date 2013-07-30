@@ -14,5 +14,4 @@ class FeedPlugin {
 			page.content = page.content.replace(LINKS_TAG, applyTemplate('feed/links', '', newBinding([:])).toString())
 		}
 	}
-
 }

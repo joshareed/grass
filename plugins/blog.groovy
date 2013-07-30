@@ -2,7 +2,7 @@ import java.text.SimpleDateFormat
 
 class BlogPlugin {
 	def DATE = new SimpleDateFormat('yyyy-MM-dd')
-	def LIST_TAG = /<blog:list\/>/
+	def INDEX_TAG = /<blog:index\/>/
 	def RECENT_TAG = /<blog:recent\/>/
 	def PREVIOUS_TAG = /<blog:previous\/>/
 	def NEXT_TAG = /<blog:next\/>/
@@ -35,7 +35,7 @@ class BlogPlugin {
 
 		if (page.post) {
 			// set the template to post
-			page.template = 'post'
+			page.template = 'blog/post'
 
 			// check for date in filename
 			if (page.name =~ /^(19|20)\d\d-(0[1-9]|1[012])-(0[1-9]|[12][0-9]|3[01])/) {
@@ -56,7 +56,7 @@ class BlogPlugin {
 	def beforeIndex(index, pages) {
 		// if the index has no content, insert the blog summary tag
 		if (!index.content) {
-			index.content = LIST_TAG
+			index.content = INDEX_TAG
 		}
 	}
 
@@ -66,11 +66,11 @@ class BlogPlugin {
 	}
 
 	def beforeWrite(page) {
-		if (page.content.contains(LIST_TAG)) {
-			page.content = page.content.replace(LIST_TAG, applyTemplate('blog/list', '', newBinding(posts: posts)).toString())
+		if (page.content.contains(INDEX_TAG)) {
+			page.content = page.content.replace(INDEX_TAG, applyTemplate('blog/index.html', '', newBinding(posts: posts)).toString())
 		}
 		if (page.content.contains(RECENT_TAG)) {
-			page.content = page.content.replace(RECENT_TAG, applyTemplate('blog/recent', '', newBinding(posts: recent)).toString())
+			page.content = page.content.replace(RECENT_TAG, applyTemplate('blog/recent.html', '', newBinding(posts: recent)).toString())
 		}
 		if (page.content.contains(PREVIOUS_TAG)) {
 			def previous = posts.indexOf(page) - 1

@@ -4,7 +4,7 @@
 </head>
 <body>
 	<section id="content">
-		<blog:index/>
+		${render(model: page, as: 'post', using: '_full.html')}
 	</section>
 	${include('/_sidebar.html')}
 </body>

@@ -1,1 +1,13 @@
-<li class="post"><a href="${post.out.substring(1)}">${post.title}</a></li>
+<article>
+	<header>
+		<h1>
+			<a href="${createLink(post)}">${post.title}</a>
+		</h1>
+		<p class="meta">
+			<time datetime="${isodate(post.date)}">${prettydate(post.date)}</time>
+		</p>
+	</header>
+	<footer>
+		<tags:page/>
+	</footer>
+</article>
