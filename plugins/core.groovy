@@ -31,27 +31,17 @@ class CorePlugin {
 			}
 		}
 		binding.include = { path ->
-			def relative = binding['.'] ?: page?.path
-			if (relative?.isFile()) {
-				relative = relative.parentFile
-			}
-			def file = new File(relative, path)
+			def file = findTemplate(path, binding)
 			if (file.exists()) {
 				evaluate(file.text, binding)
 			}
 		}
 		binding.render = { Map args ->
-			// setup our relative path
-			def relative = binding['.'] ?: page?.path
-			if (relative?.isFile()) {
-				relative = relative.parentFile
-			}
-
 			def pathKey = ['path', 'template', 'using'].find { args.containsKey(it) }
 			if (!pathKey) fail('Template path required')
 			def path = args[pathKey]
 
-			def file = new File(relative, path)
+			def file = findTemplate(path, binding)
 			if (file.exists()) {
 				def data = [:]
 				data.putAll(binding)

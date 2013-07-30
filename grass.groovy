@@ -166,11 +166,7 @@ class GrassMixin {
 	}
 
 	def applyTemplate(id, content, binding) {
-		def template = expandPaths(config?.paths?.templates ?: []).inject([]) { list, dir ->
-			list << new File(dir, id)
-			list << new File(dir, "${id}.html")
-			list
-		}.find { it.exists() }
+		def template = findTemplate(id, binding)
 
 		if (template) {
 			binding['.'] = template
@@ -180,6 +176,37 @@ class GrassMixin {
 		} else {
 			content
 		}
+	}
+
+	def findTemplate(id, binding = [:]) {
+		// check relative to '.' in the binding
+		if (!id.startsWith('/') && binding['.'] instanceof File) {
+			def relative = binding['.']
+			if (relative?.isFile()) {
+				relative = relative.parentFile
+			}
+			def test = new File(relative, id)
+			if (test.exists()) {
+				return test
+			}
+			test = new File(relative, "${id}.html")
+			if (test.exists()) {
+				return test
+			}
+		}
+
+		// strip leading slash
+		def path = id
+		if (path.startsWith('/')) {
+			path = path[1..-1]
+		}
+
+		// check all template roots
+		expandPaths(config?.paths?.templates ?: []).inject([]) { list, dir ->
+			list << new File(dir, path)
+			list << new File(dir, "${path}.html")
+			list
+		}.find { it.exists() }
 	}
 
 	def expandPaths(paths) {
