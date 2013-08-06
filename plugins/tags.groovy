@@ -4,12 +4,12 @@ class TagsPlugin {
 	def PAGE_TAG = /<tags:page\/>/
 
 	def config
-	def tags = [:]
 
 	def init() {
 		if (config?.plugin?.links?.dispatch) {
 			config?.plugin?.links?.dispatch << 'tag'
 		}
+		config.tags = [:]
 	}
 
 
@@ -27,7 +27,7 @@ class TagsPlugin {
 	}
 
 	def afterIndex(index, pages) {
-		tags.each { k, v ->
+		config.tags.each { k, v ->
 			def posts = v.sort { a, b -> b.date <=> a.date }
 			def content = applyTemplate('tags/index.html', '', newBinding(pages: posts))
 			addPage(content: content, name: "Category: $k", title: "Category: $k", date: new Date(), out: "tags/${normalize(k)}.html")
@@ -50,10 +50,10 @@ class TagsPlugin {
 
 	private tag(page, name) {
 		page.tags << name
-		if (tags.containsKey(name)) {
-			tags[name] << page
+		if (config.tags.containsKey(name)) {
+			config.tags[name] << page
 		} else {
-			tags[name] = [page]
+			config.tags[name] = [page]
 		}
 	}
 }
