@@ -43,3 +43,32 @@ a {
 	padding: 0 1em 2em 1em;
 	border-bottom: 1px solid #ccc;
 }
+#content h1 {
+	margin: 1.25em 0 0.5em 0;
+}
+article header .meta {
+	position: absolute;
+	top: 0;
+	text-transform: uppercase;
+	font-size: 0.9em;
+	color: #aaa;
+}
+footer {
+	margin-top: 2em;
+}
+footer ul {
+	padding-left: 0;
+	margin: 0;
+}
+.tags li {
+	display: inline;
+	list-style-type: none;
+	margin-right: 5px;
+	padding: 5px;
+	border: 1px solid #ccc;
+	border-radius: 5px;
+}
+.tags li:hover {
+	background-color: #ccc;
+	border-color: #aaa;
+}
