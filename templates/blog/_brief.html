@@ -1,11 +1,11 @@
 <article>
 	<header>
-		<h1>
-			<a href="${createLink(post)}">${post.title}</a>
-		</h1>
 		<p class="meta">
 			<time datetime="${isodate(post.date)}">${prettydate(post.date)}</time>
 		</p>
+		<h1>
+			<a href="${createLink(post)}">${post.title}</a>
+		</h1>
 	</header>
 	<footer>
 		<tags:page/>

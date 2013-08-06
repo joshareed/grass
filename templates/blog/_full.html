@@ -1,18 +1,16 @@
 <article>
 	<header>
-		<h1>${post.title}</h1>
 		<p class="meta">
 			<time datetime="${isodate(post.date)}">${prettydate(post.date)}</time>
 		</p>
+		<h1>${post.title}</h1>
 	</header>
 	${post.content}
 	<footer>
 		<nav>
-			<ul>
-				<tags:page/>
-				<blog:previous/>
-				<blog:next/>
-			</ul>
+			<tags:page/>
+			<blog:previous/>
+			<blog:next/>
 		</nav>
 	</footer>
 </article>

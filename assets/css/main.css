@@ -44,11 +44,9 @@ a {
 	border-bottom: 1px solid #ccc;
 }
 #content h1 {
-	margin: 1.25em 0 0.5em 0;
+	margin: 0 0 0.5em 0;
 }
 article header .meta {
-	position: absolute;
-	top: 0;
 	text-transform: uppercase;
 	font-size: 0.9em;
 	color: #aaa;
@@ -60,8 +58,12 @@ footer ul {
 	padding-left: 0;
 	margin: 0;
 }
+.tags {
+	display: block;
+	text-align: center;
+}
 .tags li {
-	display: inline;
+	display: inline-block;
 	list-style-type: none;
 	margin-right: 5px;
 	padding: 5px;
@@ -71,4 +73,12 @@ footer ul {
 .tags li:hover {
 	background-color: #ccc;
 	border-color: #aaa;
+}
+footer .prev {
+	float: left;
+	margin-top: -26px;
+}
+footer .next {
+	float: right;
+	margin-top: -26px;
 }
