@@ -2,6 +2,7 @@ import java.net.URLEncoder
 
 class TagsPlugin {
 	def PAGE_TAG = /<tags:page\/>/
+	def LIST_TAG = /<tags:list\/>/
 
 	def config
 
@@ -41,6 +42,9 @@ class TagsPlugin {
 			} else {
 				page.content = page.content.replace(PAGE_TAG, '')
 			}
+		}
+		if (config.tags && page.content.contains(LIST_TAG)) {
+			page.content = page.content.replace(LIST_TAG, applyTemplate('tags/list.html', '', newBinding(tags: config.tags)).toString())
 		}
 	}
 
