@@ -9,7 +9,6 @@ class Page {
 	Date date
 	String summary
 	String content
-	List tags = []
 }
 
 // command line parsing
