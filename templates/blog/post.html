@@ -5,6 +5,7 @@
 <body>
 	<section id="content">
 		${render(model: page, as: 'post', using: '_full.html')}
+		${include('/_footer.html')}
 	</section>
 	${include('/_sidebar.html')}
 </body>

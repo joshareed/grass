@@ -1,6 +1,6 @@
 <header role="banner">
 	<hgroup>
-		<h1><a href="${config.site.url}">${config.site.title}</a></h1>
+		<h1><a href="${createLink(url: '/')}">${config.site.title}</a></h1>
 		${when(config?.site?.subtitle, "<h2>" + config.site.subtitle + "</h2>")}
 	</hgroup>
 </header>
