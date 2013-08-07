@@ -210,8 +210,8 @@ class GrassMixin {
 
 	def expandPaths(paths) {
 		[paths].flatten().inject([]) { list, path ->
-			list << new File(path)
 			list << new File(config.source, path)
+			list << new File(path)
 			list
 		}.findAll { it.exists() }
 	}
