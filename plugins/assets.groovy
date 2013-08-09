@@ -35,14 +35,14 @@ class AssetsPlugin {
 			def global = new File(path)
 			if (global.exists()) {
 				ant.copy(todir: new File(config.destination, path).absolutePath) {
-					fileset(dir: global.absolutePath)
+					global.directory ? fileset(dir: global.absolutePath) : fileset(file: global.absolutePath)
 				}
 			}
 
 			def local = new File(config.source, path)
 			if (local.exists()) {
 				ant.copy(todir: new File(config.destination, path).absolutePath) {
-					fileset(dir: local.absolutePath)
+					local.directory ? fileset(dir: local.absolutePath) : fileset(file: local.absolutePath)
 				}
 			}
 		}
