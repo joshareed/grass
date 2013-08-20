@@ -28,22 +28,29 @@ class AssetsPlugin {
 	}
 
 	def afterIndex(index, pages) {
-		def ant = new AntBuilder()
-
 		// walk through our paths and copy over assets
 		config?.paths?.assets?.each { path ->
 			def global = new File(path)
 			if (global.exists()) {
-				ant.copy(todir: new File(config.destination, path).absolutePath) {
-					global.directory ? fileset(dir: global.absolutePath) : fileset(file: global.absolutePath)
-				}
+				copy(global, new File(config.destination, path))
 			}
 
 			def local = new File(config.source, path)
 			if (local.exists()) {
-				ant.copy(todir: new File(config.destination, path).absolutePath) {
-					local.directory ? fileset(dir: local.absolutePath) : fileset(file: local.absolutePath)
-				}
+				copy(local, new File(config.destination, path))
+			}
+		}
+	}
+
+	private copy(from, to) {
+		def ant = new AntBuilder()
+		if (from.directory) {
+			ant.copy(todir: to.absolutePath) {
+				fileset(dir: from.absolutePath)
+			}
+		} else {
+			ant.copy(todir: config.destination.absolutePath) {
+				fileset(file: from.absolutePath)
 			}
 		}
 	}
