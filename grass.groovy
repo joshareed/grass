@@ -107,6 +107,7 @@ def loadPlugins() {
 def loadPages() {
 	expandPaths(config?.paths?.pages ?: []).each { dir ->
 		dir.eachFile { file ->
+            if (file.name.equals('.DS_Store')) return  // Exclude .DS_Store files
 			// create our page object
 			def name = file.name
 			if (name.lastIndexOf('.') > 0) {
