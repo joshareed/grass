@@ -62,7 +62,7 @@ class CorePlugin {
 			test ? '' : out
 		}
 		binding.isodate = { date ->
-			date.format("yyyy-MM-dd'T'HH:mm:ssZ")
+			date.format("yyyy-MM-dd'T'HH:mm:ssXXX")
 		}
 		binding.prettydate = { date ->
 			date.format("MMM dd, yyyy")
