@@ -17,8 +17,8 @@ The first thing you need for a GRASS powered site is a `site-config.groovy` file
 		author = "Some Guy"
 		email = "someguy@gmail.com"
 		url = "http://someguyblogs.com"
-	    twitter = "https://twitter.com/someguy"
-	    github = "https://github.com/someguy"
+		twitter = "https://twitter.com/someguy"
+		github = "https://github.com/someguy"
 	}
 
 As you create your own templates and modify the included ones, feel free to add whatever constants you desire to this file.
@@ -85,7 +85,7 @@ GRASS looks for plugins in the location specified either in your `global-config.
 
 ### Selectively Applying Plugins
 
-As shown in `global-config.groovy`, it is possible to selectively enable or disable plugins. To do so, pass in the class name of the plugin. If I wanted to disable the feeds plugin, I would add:
+As shown in `global-config.groovy`, it is possible to selectively enable or disable plugins. To do so, pass in the class name of the plugin. If I wanted to disable the feeds plugin, I would add the following to my `site-config.groovy` file:
 
 	plugins.disabled = ['FeedPlugin']
 
